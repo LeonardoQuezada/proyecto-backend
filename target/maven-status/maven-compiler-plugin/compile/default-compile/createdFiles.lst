@@ -1,0 +1,9 @@
+com\gestion\tasking\entity\User.class
+com\gestion\tasking\TaskingApplication.class
+com\gestion\tasking\controller\AuthController.class
+com\gestion\tasking\service\UserService.class
+com\gestion\tasking\model\AuthResponse.class
+com\gestion\tasking\WebConfig.class
+com\gestion\tasking\model\LoginRequest.class
+com\gestion\tasking\repository\UserRepository.class
+com\gestion\tasking\service\AuthService.class
