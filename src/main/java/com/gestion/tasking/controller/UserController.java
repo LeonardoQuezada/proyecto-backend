@@ -10,7 +10,7 @@ import com.gestion.tasking.DAO.UserDAO;
 import com.gestion.tasking.entity.User;
 
 @RestController
-@RequestMapping("/api/users")  
+@RequestMapping("/api/user")  
 public class UserController {
 
     @Autowired
