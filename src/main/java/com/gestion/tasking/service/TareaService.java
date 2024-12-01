@@ -2,6 +2,7 @@ package com.gestion.tasking.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,5 +29,10 @@ public class TareaService {
             // Si ocurre un error, propagar la excepción con el mensaje adecuado
             throw new RuntimeException(e.getMessage()); // Excepción con el mensaje conciso
         }
+    }
+    
+    
+    public List<Tarea> obtenerTareasPorProyecto(int idProyecto) {
+        return tareaDAO.obtenerTareasPorProyecto(idProyecto);
     }
 }

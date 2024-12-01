@@ -1,9 +1,16 @@
 package com.gestion.tasking.DAO;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
 import com.gestion.tasking.entity.Tarea;
 
 
@@ -45,4 +52,29 @@ public class TareaDAOImpl implements TareaDAO {
 
          return tarea;
      }
+
+    @Override
+    public List<Tarea> obtenerTareasPorProyecto(int idProyecto) {
+        // SQL para obtener las tareas de un proyecto específico
+        String sql = "SELECT * FROM tg_tareas WHERE id_tg_proyectos = ?";
+
+        // Usar PreparedStatementSetter para establecer el parámetro
+        PreparedStatementSetter pss = ps -> ps.setInt(1, idProyecto);
+
+        // Mapeamos los resultados de la consulta a objetos Tarea
+        return jdbcTemplate.query(sql, pss, new RowMapper<Tarea>() {
+            @Override
+            public Tarea mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Tarea tarea = new Tarea();
+                tarea.setIdProyecto(rs.getInt("id_tg_proyectos"));  // Cambiar a "id_tg_proyectos"
+                tarea.setNombre(rs.getString("nombre_tg_tareas"));
+                tarea.setDescripcion(rs.getString("descripcion_tg_tareas"));
+                tarea.setPrioridad(rs.getInt("id_tm_prioridad"));
+                tarea.setEstado(rs.getInt("id_tm_estado"));
+                tarea.setFechaVencimiento(rs.getDate("fecha_vencimiento_tg_tareas").toLocalDate());
+                return tarea;
+            }
+        });
+    }
+
 }
