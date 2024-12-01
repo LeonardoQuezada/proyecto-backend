@@ -1,0 +1,53 @@
+package com.gestion.tasking.entity;
+
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tg_proyectos")
+public class Proyecto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tg_proyectos")
+    @JsonProperty("idProyecto")
+    private Integer idTgProyectos;
+
+    
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private User usuario;
+
+    @Column(name = "nombre_tg_proyectos")
+    @JsonProperty("nombreProyecto")
+    private String nombreTgProyectos;
+
+    @Column(name = "descripcion_tg_proyectos")
+    @JsonProperty("descripcionProyecto")
+    private String descripcionTgProyectos;
+
+    @ManyToOne
+    @JoinColumn(name = "id_tm_prioridad")
+    @JsonProperty("prioridad")
+    private Prioridad prioridad;
+
+    @Column(name = "fecha_vencimiento_tg_proyectos")
+    @JsonProperty("fechaVencimiento")
+    private LocalDate fechaVencimientoTgProyectos;
+
+    @Column(name = "fecha_creacion_tg_proyectos")
+    @JsonProperty("fechaCreacion")
+    private LocalDate fechaCreacionTgProyectos;
+}
