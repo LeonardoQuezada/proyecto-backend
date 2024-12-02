@@ -4,10 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +66,31 @@ public class ProyectoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Este usuario no tiene proyectos activos"));
         }
 
+        // Crear la respuesta con los datos necesarios y omitir detalles del usuario
+        List<Map<String, Object>> proyectosResponse = proyectos.stream().map(proyecto -> {
+            // Usar LinkedHashMap para mantener el orden de los campos
+            Map<String, Object> proyectoMap = new LinkedHashMap<>();
+            proyectoMap.put("idProyecto", proyecto.getIdTgProyectos());
+            proyectoMap.put("nombreProyecto", proyecto.getNombreTgProyectos());
+            proyectoMap.put("descripcionProyecto", proyecto.getDescripcionTgProyectos());
+            proyectoMap.put("idPrioridad", proyecto.getPrioridad().getIdPrioridad());
+
+            // Formatear la fecha de creación para incluir la hora correctamente
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            String fechaCreacionFormatted = proyecto.getFechaCreacionTgProyectos().format(formatter);
+            proyectoMap.put("fechaCreacion", fechaCreacionFormatted);
+
+            proyectoMap.put("fechaVencimiento", proyecto.getFechaVencimientoTgProyectos());
+
+            return proyectoMap;
+        }).collect(Collectors.toList());
+
         logger.info("Proyectos encontrados para el usuario con ID {}: {}", usuarioId, proyectos.size());
-        return ResponseEntity.ok(proyectos);
+        return ResponseEntity.ok(proyectosResponse);
     }
+
+
+
     
     
    
@@ -74,6 +98,9 @@ public class ProyectoController {
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarProyecto(@RequestBody Map<String, Object> input) {
         try {
+            // Log para verificar el contenido de la entrada
+            System.out.println("Contenido de la solicitud: " + input);
+
             // Crear una nueva instancia de Proyecto
             Proyecto proyecto = new Proyecto();
 
@@ -89,21 +116,23 @@ public class ProyectoController {
             proyecto.setNombreTgProyectos((String) input.get("nombreProyecto"));
             proyecto.setDescripcionTgProyectos((String) input.get("descripcionProyecto"));
 
-            // Convertir la fechaCreacion del formato
-            String fechaCreacionString = (String) input.get("fechaCreacion");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate fechaCreacionLocalDate = LocalDate.parse(fechaCreacionString, formatter);
-            
-            // la hora actual para la fecha de creación
-            LocalDateTime fechaCreacion = fechaCreacionLocalDate.atTime(LocalTime.now());  // Usa la hora actual
+            // Generar automáticamente la fecha de creación con la hora actual si no se envía en el JSON
+            LocalDateTime fechaCreacion = LocalDateTime.now(); // Usa la fecha y hora actual
             proyecto.setFechaCreacionTgProyectos(fechaCreacion);
 
             // Convertir la fechaVencimiento
             String fechaVencimientoString = (String) input.get("fechaVencimiento");
-            LocalDate fechaVencimiento = LocalDate.parse(fechaVencimientoString);
-            proyecto.setFechaVencimientoTgProyectos(fechaVencimiento);
+            if (fechaVencimientoString == null) {
+                return ResponseEntity.badRequest().body("La fecha de vencimiento es requerida.");
+            }
+            try {
+                LocalDate fechaVencimiento = LocalDate.parse(fechaVencimientoString);
+                proyecto.setFechaVencimientoTgProyectos(fechaVencimiento);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Formato de fecha de vencimiento inválido.");
+            }
 
-            // la prioridad
+            // La prioridad
             Integer idPrioridad = (Integer) input.get("prioridad");
             if (idPrioridad == null || idPrioridad <= 0) {
                 return ResponseEntity.badRequest().body("El ID de la prioridad es requerido.");
@@ -112,11 +141,11 @@ public class ProyectoController {
             prioridad.setIdPrioridad(idPrioridad);
             proyecto.setPrioridad(prioridad);
 
-            // Registrar el proyec
+            // Registrar el proyecto
             Proyecto nuevoProyecto = proyectoService.agregarProyecto(proyecto);
 
             // Crear la respuesta en el formato deseado usando LinkedHashMap
-            Map<String, Object> response = new LinkedHashMap<>();  // mantener ordenado el formato de salida
+            Map<String, Object> response = new LinkedHashMap<>();  // Mantener ordenado el formato de salida
             response.put("idUsuario", nuevoProyecto.getUsuario().getId());
             response.put("idProyecto", nuevoProyecto.getIdTgProyectos());
             response.put("nombreProyecto", nuevoProyecto.getNombreTgProyectos());
@@ -128,14 +157,19 @@ public class ProyectoController {
             String fechaCreacionFormatted = nuevoProyecto.getFechaCreacionTgProyectos().format(responseFormatter);
             response.put("fechaCreacion", fechaCreacionFormatted);
 
+            // Incluir la fechaVencimiento en la respuesta
             response.put("fechaVencimiento", nuevoProyecto.getFechaVencimientoTgProyectos());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            // Mostrar el mensaje de error específico en los logs
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al registrar el proyecto: " + e.getMessage());
         }
     }
+
+
 
     
 }
