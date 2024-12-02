@@ -1,6 +1,7 @@
 package com.gestion.tasking.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime; // Cambiado a LocalDateTime
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "tg_proyectos")
 public class Proyecto {
@@ -24,7 +29,6 @@ public class Proyecto {
     @JsonProperty("idProyecto")
     private Integer idTgProyectos;
 
-    
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
@@ -47,7 +51,8 @@ public class Proyecto {
     @JsonProperty("fechaVencimiento")
     private LocalDate fechaVencimientoTgProyectos;
 
+    // Cambiado de LocalDate a LocalDateTime para incluir hora
     @Column(name = "fecha_creacion_tg_proyectos")
     @JsonProperty("fechaCreacion")
-    private LocalDate fechaCreacionTgProyectos;
+    private LocalDateTime fechaCreacionTgProyectos; // Actualizado a LocalDateTime
 }

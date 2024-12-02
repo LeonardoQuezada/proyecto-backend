@@ -26,6 +26,19 @@ public class ProyectoDAOImpl implements ProyectoDAO {
 
         return query.getResultList();
     }
+    
+    @Override
+    public Proyecto save(Proyecto proyecto) {
+        if (proyecto.getIdTgProyectos() == null) {
+            // Crear un nuevo proyecto
+            entityManager.persist(proyecto);
+            return proyecto;
+        } else {
+            // Actualizar un proyecto existente
+            return entityManager.merge(proyecto);
+        }
+    }
+
 
 
 }

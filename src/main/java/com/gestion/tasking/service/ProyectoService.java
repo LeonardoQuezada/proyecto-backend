@@ -9,6 +9,8 @@ import com.gestion.tasking.DAO.ProyectoDAO;
 import com.gestion.tasking.entity.Proyecto;
 import com.gestion.tasking.entity.User;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProyectoService {
 
@@ -19,4 +21,13 @@ public class ProyectoService {
     public List<Proyecto> listarProyectosPorUsuario(User usuario) {
         return proyectoDAO.findByUsuario(usuario);
     }
+    
+    
+    @Transactional
+
+    public Proyecto agregarProyecto(Proyecto proyecto) {
+        // Lógica adicional, como validar datos del proyecto si es necesario
+        return proyectoDAO.save(proyecto);
+    }
+
 }
