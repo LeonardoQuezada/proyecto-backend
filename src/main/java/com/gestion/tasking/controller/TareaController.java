@@ -1,5 +1,7 @@
 package com.gestion.tasking.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +77,7 @@ public class TareaController {
     @PostMapping("/proyecto")
     public ResponseEntity<?> obtenerTareasPorProyecto(@RequestBody Map<String, Integer> request) {
         int idProyecto = request.get("idProyecto");  // Extraemos el idProyecto del cuerpo del JSON
-        
+
         if (idProyecto <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse(400, "El ID del proyecto debe ser mayor a cero."));
@@ -88,6 +90,24 @@ public class TareaController {
                     .body(new AuthResponse(404, "No se encontraron tareas para este proyecto."));
         }
 
-        return ResponseEntity.ok(tareas);
+        // Excluir campo idProyecto
+        List<Map<String, Object>> tareasResponse = new ArrayList<>();
+        for (Tarea tarea : tareas) {
+            Map<String, Object> tareaData = new HashMap<>();
+            tareaData.put("idTarea", tarea.getIdTarea());
+            tareaData.put("nombre", tarea.getNombre());
+            tareaData.put("descripcion", tarea.getDescripcion());
+            tareaData.put("prioridad", tarea.getPrioridad());
+            tareaData.put("estado", tarea.getEstado());
+            tareaData.put("fechaVencimiento", tarea.getFechaVencimiento());
+            tareaData.put("fechaCreacion", tarea.getFechaCreacion()); // Incluir fechaCreacion en la respuesta
+            tareasResponse.add(tareaData);
+        }
+
+        return ResponseEntity.ok(tareasResponse); // Respuesta con fechaCreacion
     }
+
+
+
+
 }

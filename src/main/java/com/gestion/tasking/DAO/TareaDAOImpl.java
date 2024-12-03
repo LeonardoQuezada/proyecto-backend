@@ -66,15 +66,22 @@ public class TareaDAOImpl implements TareaDAO {
             @Override
             public Tarea mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Tarea tarea = new Tarea();
-                tarea.setIdProyecto(rs.getInt("id_tg_proyectos"));  // Cambiar a "id_tg_proyectos"
+                tarea.setIdTarea(rs.getInt("id_tg_tareas")); // Mapeo actualizado a id_tarea
                 tarea.setNombre(rs.getString("nombre_tg_tareas"));
                 tarea.setDescripcion(rs.getString("descripcion_tg_tareas"));
                 tarea.setPrioridad(rs.getInt("id_tm_prioridad"));
                 tarea.setEstado(rs.getInt("id_tm_estado"));
                 tarea.setFechaVencimiento(rs.getDate("fecha_vencimiento_tg_tareas").toLocalDate());
+                
+                // Convertimos el campo de fechaCreacion con hora y minuto
+                tarea.setFechaCreacion(rs.getTimestamp("fecha_creacion_tg_tareas").toLocalDateTime());
+
                 return tarea;
             }
         });
     }
+
+
+
 
 }
